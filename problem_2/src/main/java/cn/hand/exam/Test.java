@@ -1,47 +1,91 @@
-package cn.hand.exam;
+package cn.hand.Exam;
 
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Test {
-
 	public static void main(String[] args) {
-		// 输入工资
-		System.out.println("请输入你的工资：");
 		Scanner sc = new Scanner(System.in);
-		double salary = sc.nextDouble();
-		
+		System.out.println("请按格式yyyy-MM-dd输入日期：");
+		String strDate = sc.next();
 
-		double tax = salary - 3500;
-		double taxRate = getTaxRate(tax);
-		System.out.println("你需要交纳的税费为："+taxRate);
+		/*
+		 * //日期格式验证 String regEx = \d{4}(\-|\/|.)\d{1,2}\1\d{1,2}; // 编译正则表达式
+		 * Pattern pattern = Pattern.compile(regEx); // 忽略大小写的写法 Matcher matcher
+		 * = pattern.matcher(strDate); // 字符串是否与正则表达式相匹配 boolean rs =
+		 * matcher.matches();
+		 */
 
+		String nextDay = null;
+		// 得到该日期的年月日
+		int year = 0;
+		int month = 0;
+		int day = 0;
+		try {
+			String[] strs = strDate.split("-");
+			year = Integer.parseInt(strs[0]);
+			month = Integer.parseInt(strs[1]);
+			day = Integer.parseInt(strs[2]);
+		} catch (Exception e) {
+			System.out.println("日期格式输入有误，请参照2018-08-04格式输入");
+			return;
+		}
+		boolean flag = checkDate(strDate);
+		if (flag) {
+
+			// 处理闰年
+			if (((year % 4 == 0 && year % 100 != 0) || year % 400 == 0)) {
+				if ((month == 1 || month == 3 || month == 5 || month == 7
+						|| month == 8 || month == 10 || month == 12)
+						&& day == 31) {
+					month = month + 1;
+					nextDay = year + "-" + month + "-01";
+				} else if ((month == 4 || month == 6 || month == 9 || month == 11)
+						&& day == 30) {
+					month = month + 1;
+					nextDay = year + "-" + month + "-01";
+				} else if (month == 2 && day == 29) {
+					nextDay = year + "-03-01";
+				} else {
+					day = day + 1;
+					nextDay = year + "-" + month + "-" + day;
+				}
+
+			} else {
+				if ((month == 1 || month == 3 || month == 5 || month == 7
+						|| month == 8 || month == 10 || month == 12)
+						&& day == 31) {
+					month = month + 1;
+					nextDay = year + "-" + month + "-01";
+				} else if ((month == 4 || month == 6 || month == 9 || month == 11)
+						&& day == 30) {
+					month = month + 1;
+					nextDay = year + "-" + month + "-01";
+				} else if (month == 2 && day == 28) {
+					nextDay = year + "-03-01";
+				} else {
+					day = day + 1;
+					nextDay = year + "-" + month + "-" + day;
+				}
+			}
+			System.out.println("下一天为：" + nextDay);
+
+		} else {
+			System.out.println("您输入的日期不存在");
+		}
 	}
 
-	// 工资应交税
-	public static double getTaxRate(double tax) {
-		if (tax <= 0)
-			tax = 0;
-		else if (tax > 0 && tax <= 1500)
-			tax = tax * 0.03;
-		else if (tax <= 4500)
-			tax = 1500 * 0.03 + (tax - 1500) * 0.1;
-		else if (tax <= 9000)
-			tax = 1500 * 0.03 + 3000 * 0.1 + (tax-4500) * 0.2;
-		else if (tax <= 35000)
-			tax = 1500 * 0.03 + 3000 * 0.1 + 4500 * 0.2
-					+ (tax - 9000) * 0.25;
-		else if (tax <= 55000)
-			tax = 1500 * 0.03 + 3000 * 0.1 + 4500 * 0.2
-					+ 26000 * 0.25 + (tax - 35000) * 0.3;
-		else if (tax <= 8000)
-			tax = 1500 * 0.03 + 3000 * 0.1 + 4500 * 0.2
-					+ 26000 * 0.25 + 20000 * 0.3 + (tax - 55000)
-					* 0.35;
-		else
-			tax = 1500 * 0.03 + 3000 * 0.1 + 4500 * 0.2
-					+ 26000 * 0.25 + 20000 * 0.3 + 25000
-					* 0.35 + (tax - 80000) * 0.45;
-
-		return tax;
+	// 判断输入日期是否合法
+	static boolean checkDate(String str) {
+		SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			sd.setLenient(false);// 此处指定解析是否严格，false时为严格
+			sd.parse(str);// 从给定字符串的开始解析文本，以生成一个日期
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 }
